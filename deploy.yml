@@ -1,6 +1,6 @@
 ---
 
-- hosts: all
+- hosts: production
   become: yes
   become_method: sudo
   roles:
