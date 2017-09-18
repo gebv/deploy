@@ -27,7 +27,7 @@
   tags: ['debug']
 
 - name: Copy app bin file
-  copy: src=app dest=/opt/app/{{ item.key }}/{{ release_id.stdout }}/{{ item.key }} owner={{ app_user }} group={{ app_group }} force=yes mode=a+x
+  copy: src={{ item.key }} dest=/opt/app/{{ item.key }}/{{ release_id.stdout }}/{{ item.key }} owner={{ app_user }} group={{ app_group }} force=yes mode=a+x
   with_dict: "{{ upstream }}"
   tags: ['debug']
 

@@ -6,7 +6,7 @@
   tags: ['debug']
 
 - name: TEST Copy app bin file
-  copy: src=app dest=/opt/app/testing/{{ item.key }}/{{ item.key }} owner={{ app_user }} group={{ app_group }} force=yes mode=a+x
+  copy: src={{ item.key }} dest=/opt/app/testing/{{ item.key }}/{{ item.key }} owner={{ app_user }} group={{ app_group }} force=yes mode=a+x
   with_dict: "{{ upstream }}"
   tags: ['debug']
 
