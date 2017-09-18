@@ -1,0 +1,25 @@
+- hosts: all
+  vars:
+    upstream:
+      app1:
+        test_port: 7009
+        ports:
+          - 8000
+          - 8001
+          - 8002
+          - 8003
+          - 8004
+      app2:
+        test_port: 7010
+        ports:
+          - 9000
+          - 9001
+          - 9002
+          - 9003
+          - 9004
+  tasks:
+  - debug: msg="{{ item.1 }}-{{ item.2 }}"
+    with_subelements:
+      - "{{ upstream }}"
+      - "{{ upstream.key() }}"
+      - ports
