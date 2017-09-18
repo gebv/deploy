@@ -1,0 +1,7 @@
+{% for name in upstream %}
+upstream {{ name }} {
+{% for port in upstream[name].ports %}
+    server 127.0.0.1:{{ port }};
+{% endfor %}
+}
+{% endfor %}

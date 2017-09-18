@@ -3,6 +3,9 @@
 - hosts: production
   become: yes
   become_method: sudo
+  vars_files:
+    - config.yml
   roles:
     - { role: common, app_user: app, app_group: app }
-    - { role: deploy, app_user: app, app_group: app, app_instance: 5 }
+    - { role: deploy, app_user: app, app_group: app, test_port: 7999 }
+    

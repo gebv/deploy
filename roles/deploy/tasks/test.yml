@@ -1,43 +1,53 @@
 ---
 
 - name: TEST Create release dir
-  file: path=/opt/app/testing state=directory mode=0755 owner={{ app_user}} group={{ app_group }}
+  file: path=/opt/app/testing/{{ item.key }} state=directory mode=0755 owner={{ app_user }} group={{ app_group }}
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
 - name: TEST Copy app bin file
-  copy: src=app dest=/opt/app/testing/ owner={{ app_user}} group={{ app_group }} force=yes mode=a+x
+  copy: src=app dest=/opt/app/testing/{{ item.key }}/{{ item.key }} owner={{ app_user }} group={{ app_group }} force=yes mode=a+x
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
-- name: Create symlink to new app
-  file: src=/opt/app/testing/app dest=/usr/local/bin/app state=link force=yes
+- name: TEST Create symlink to new app
+  file: src=/opt/app/testing/{{ item.key }}/{{ item.key }} dest=/usr/local/bin/{{ item.key }}-{{ item.value.test_port }} state=link force=yes
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
 - name: TEST Generate systemd config
-  template: src=app.service dest=/etc/systemd/system/app-{{ item }}.service mode=0644 owner=root group=root
-  with_items: "7999"
+  template: src=testing.service dest=/etc/systemd/system/{{ item.key }}-{{ item.value.test_port }}.service mode=0644 owner=root group=root
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
-- name: "Start app-7999"
-  systemd: state=started daemon_reload=yes name=app-{{ item }}.service
-  with_items: "7999"
+- name: TEST Start "{{ item.key }}-{{ item.value.test_port }}"
+  systemd: state=started daemon_reload=yes name={{ item.key }}-{{ item.value.test_port }}.service
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
 - name: TEST Check app status
-  uri:
-    url: "http://127.0.0.1:7999/stats"
-    return_content: yes
-    method: GET
-    status_code: 200
-    body_format: json
+  uri: url="http://127.0.0.1:{{ item.value.test_port }}/stats" return_content=yes method=GET status_code=200 body_format=json
   register: json_test_response
-  until: json_test_response.json.status == "ok"
+  with_dict: "{{ upstream }}"
+  until: "{{ json_test_response.json.status == 'ok' }}"
+  tags: ['debug']
 
-- name: TEST stop deploy
-  fail: msg="Deploy failed"
-  when: "{{ json_test_response.json.status != 'ok' }}"
+- name: TEST stop test app
+  systemd: state=stopped daemon_reload=yes name={{ item.key }}-{{ item.value.test_port }}.service
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
-- name: TEST stop app-7999
-  systemd: state=stopped daemon_reload=yes name=app-{{ item }}.service
-  with_items: "7999"
-
-- name: TEST Delete test app-7999.service
-  file: state=absent path=/etc/systemd/system/app-{{ item }}.service
-  with_items: "7999"
+- name: TEST Delete systemd config
+  file: state=absent path=/etc/systemd/system/{{ item.key }}-{{ item.value.test_port }}.service
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
 
 - name: TEST Delete test app
-  file: state=absent path=/usr/local/bin/app
+  file: state=absent path=/usr/local/bin/{{ item.key }}-{{ item.value.test_port }}
+  with_dict: "{{ upstream }}"
+  tags: ['debug']
+
+- name: TEST Delete test dir
+  file: state=absent path=/opt/app/testing
+  with_dict: "{{ upstream }}"
+  tags: ['debug']

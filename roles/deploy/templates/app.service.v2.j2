@@ -1,5 +1,6 @@
+{% set set_var = item.split('-') %}
 [Unit]
-Description=app-{{ item }}
+Description={{ item }}
 OnFailure=unit-status-mail@%n.service
 
 [Service]
@@ -8,9 +9,10 @@ Restart=always
 RestartSec=10
 StartLimitInterval=120
 StartLimitBurst=3
-User={{app_user}}
-Group={{app_group}}
-PIDFile=/var/run/app-{{ item }}.pid
+EnvironmentFile=/etc/{{ set_var[0] }}.{{ env }}.cfg
+User={{ app_user }}
+Group={{ app_group }}
+PIDFile=/var/run/{{ item }}.pid
 
 ExecStart={{ app_path }}/app api run --address 127.0.0.1:{{ item }} --config /etc/app.{{ env }}.cfg
 

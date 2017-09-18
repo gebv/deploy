@@ -1,0 +1,19 @@
+[Unit]
+Description={{ item.key }}-{{ item.value.test_port }}
+OnFailure=unit-status-mail@%n.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+StartLimitInterval=120
+StartLimitBurst=3
+EnvironmentFile=/etc/{{ item.key }}.{{ env }}.cfg
+User={{ app_user }}
+Group={{ app_group }}
+PIDFile=/var/run/{{ item.key }}-{{ item.value.test_port }}.pid
+
+ExecStart={{ app_path }}/{{ item.key }}-{{ item.value.test_port }} api run --address 127.0.0.1:{{ item.value.test_port }}
+
+[Install]
+WantedBy=multi-user.target
