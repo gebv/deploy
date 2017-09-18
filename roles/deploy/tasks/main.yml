@@ -82,11 +82,6 @@
   with_dict: "{{ upstream }}"
   tags: ['debug']
 
-- name: Generate nginx server config
-  template: src=nginx_server.j2 dest=/etc/nginx/conf.d/apps.conf mode=0644 owner=root group=root
-  with_dict: "{{ front }}"
-  tags: ['debug', 'ls']
-
 - name: Reload nginx
   service: name=nginx state=reloaded
   tags: ['debug', 'ls']

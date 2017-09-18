@@ -1,0 +1,19 @@
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+{% for param in front %}
+server {
+  listen {{ front[param].listen }};
+  server_name {{ front[param].server_name }};
+  {{front[param].custom_server}}
+{% for location in front[param].locations %}
+{% set custom_location = front[param].locations[location].custom_location %}
+{% set upstream = front[param].locations[location].upstream %}
+  location {{ location }} {
+    proxy_pass http://{{ upstream }};
+    {{ custom_location }}
+  }
+{% endfor %}
+}
+{% endfor %}
