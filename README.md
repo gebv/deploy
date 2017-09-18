@@ -10,7 +10,7 @@ ansible_user = root
 10.0.0.1
 ```
 
-Кол-во инстансов приложений указывается в переменной app_instance, которая находится в файле deploy.yml
+Кол-во инстансов приложений равно кол-ву портов в сconfig.yml
 
 
 ```
@@ -21,7 +21,7 @@ ansible_user = root
   become_method: sudo
   roles:
     - { role: common, app_user: app, app_group: app }
-    - { role: deploy, app_user: app, app_group: app, app_instance: 5 }
+    - { role: deploy, app_user: app, app_group: app }
 ```
 
 
@@ -37,7 +37,7 @@ ansible-playbook -i inventory deploy.yml
 roles/deploy/templates:
 
 ```
-app.service  # systemd конфиг
-config.json  # release конфиг
-nginx.app    # nginx конфиг
+app.service.j2       # systemd конфиг
+config.json.j2       # release конфиг
+nginx_upstream.j2    # nginx конфиг
 ```
