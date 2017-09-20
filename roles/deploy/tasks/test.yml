@@ -21,7 +21,7 @@
   tags: ['debug']
 
 - name: TEST Start "{{ item.key }}-{{ item.value.test_port }}"
-  systemd: state=restared daemon_reload=yes name={{ item.key }}-{{ item.value.test_port }}.service
+  systemd: state=restarted daemon_reload=yes name={{ item.key }}-{{ item.value.test_port }}.service
   with_dict: "{{ upstream }}"
   tags: ['debug']
 
